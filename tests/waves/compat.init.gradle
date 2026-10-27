@@ -1,0 +1,20 @@
+// Run against an unmodified checkout of KirisamePure/Waves at 8e7662e.
+gradle.projectsEvaluated {
+    def p = gradle.rootProject
+    def puddle = System.getenv('PUDDLE_REPO') ?: '/workspace/puddles-floods'
+    def jar = new File(puddle, 'versions/1.21.10-fabric/build/libs/puddleflood-1.1.6+1.21.10-fabric.jar')
+    if (!jar.isFile()) throw new GradleException("Build the Puddles & Floods release JAR first: ${jar}")
+    p.dependencies.add('productionRuntimeMods', p.files(jar))
+    p.sourceSets.gametest.java.srcDir(new File(puddle, 'tests/waves'))
+    p.tasks.named('processGametestResources').configure {
+        inputs.property('puddleWavesNoIris', p.hasProperty('wavesNoIris'))
+        doLast {
+            def metadata = new File(destinationDir, 'fabric.mod.json')
+            def json = new groovy.json.JsonSlurper().parse(metadata)
+            json.entrypoints['fabric-client-gametest'] = p.hasProperty('wavesNoIris')
+                ? ['dev.kirisame.waves.WavesRenderTest']
+                : ['dev.kirisame.waves.PuddleCompatibilityTest', 'dev.kirisame.waves.WavesRenderTest']
+            metadata.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(json))
+        }
+    }
+}

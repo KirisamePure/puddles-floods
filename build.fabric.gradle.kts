@@ -36,6 +36,14 @@ base.archivesName = property("mod.id") as String
 
 repositories {
     mavenLocal()
+    // The Parchment endpoint redirects to JFrog; use NeoForge's Maven mirror
+    // for the 1.21.10 target so a clean build resolves the mapping archive.
+    if (minecraft == "1.21.10") {
+        exclusiveContent {
+            forRepository { maven("https://maven.neoforged.net/releases") }
+            filter { includeGroup("org.parchmentmc.data") }
+        }
+    }
     maven("https://maven.parchmentmc.org")
     maven("https://maven.terraformersmc.com/")
     maven("https://api.modrinth.com/maven")

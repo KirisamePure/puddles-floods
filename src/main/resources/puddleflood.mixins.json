@@ -15,6 +15,7 @@
     "WaterFluidMixin"
   ],
   "client": [
+    "compat.WavesIrisBridgeMixin",
     ${BreakingBlockEffectMixin}
     "sodium.DefaultFluidRendererMixin",
     "client.AbstractWidgetMixin",
